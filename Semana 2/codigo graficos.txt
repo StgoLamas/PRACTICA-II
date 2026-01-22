@@ -1,0 +1,38 @@
+este "gr()" pode hacer los plots mas rapidos:
+ 
+julia> using Plots, Random
+ 
+       # Set a seed for reproducibility
+ 
+julia> Random.seed!(123);
+ 
+julia> num_walks = 50000;
+ 
+julia> num_steps = 1000;
+ 
+       # --- Data Generation ---
+       # Generate all steps at once for efficiency
+ 
+julia> steps = rand([-1, 1], num_steps, num_walks); # +1 or -1 for each step, each walk
+       # Cumulative sum to get positions (starting at 0)
+ 
+julia> walks = cumsum(steps, dims=1);
+       # Add the starting point (0,0) to each walk
+ 
+julia> walks = vcat(zeros(Int, 1, num_walks), walks); # shape (num_steps+1, num_walks)
+ 
+       # --- Plotting ---
+       # Use GR backend for speed
+ 
+julia> gr();
+ 
+julia> @time plot(
+           # Plot each walk as a series
+           [walks[:,i] for i in 1:num_walks], # Plotting individual series
+           title="Thousands of Random Walks",
+           xlabel="Time Step",
+           ylabel="Position",
+           lw=1,        # Line width
+           alpha=0.1,   # Transparency for many lines
+           legend=false # Hide legend if too many lines
+       )
