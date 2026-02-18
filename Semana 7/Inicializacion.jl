@@ -1,5 +1,28 @@
 # SOLO PARA INICIALIZAR
- 
+
+samples = 20000
+
+# Allocate & initialize
+Xs = Array{Float64, 3}(undef, 2, n+1, samples)
+X0 = reshape(repeat(x0, samples), (2, samples))
+Xs[:,1,:] .= X0
+
+# Simulate forward from k=1..n
+rng = MersenneTwister(39)
+dist = MvNormal(zeros(2), Δt*I2)
+for k in 1:n
+    for j in 1:samples
+        η = rand(rng, dist)
+        Xs[:,k+1,j] = Xs[:,k,j] .+ gamma*(mu .- Xs[:,k,j])*Δt .+ sqB * η
+    end
+end
+
+# Plot the trajectories
+t = 0:Δt:T
+p1 = plot(t, Xs[1,:,1:20], xlabel="Time", ylabel="D", legend=false)
+p2 = plot(t, Xs[2,:,1:20], xlabel="Time", ylabel="H", legend=false)
+plot(p1, p2, layout=(2,1), size=(700,500), title="Single‐Tree Growth Simulation")
+
 # Espaciado de las muestras para samplear cada 5 años
 t_muestras = floor(Int,5/Δt)
 # Clasificación de los árboles
